@@ -22,6 +22,12 @@ const shouldFilterPost = async (postElement) => {
     return typeof cached === 'boolean' ? { shouldFilter: cached, reason: 'Cached' } : cached;
   }
 
+  // Limit cache size to prevent memory leak
+  if (processedPosts.size >= MAX_PROCESSED_POSTS) {
+    const firstKey = processedPosts.keys().next().value;
+    processedPosts.delete(firstKey);
+  }
+
   const text = getPostText(postElement);
   await waitForImagesToLoad(postElement);
   const images = getPostImages(postElement);
@@ -111,6 +117,9 @@ const shouldFilterPost = async (postElement) => {
   return { shouldFilter: false, reason: null };
 };
 
+const MAX_HIDDEN_POSTS = 100; // Limit memory usage
+const MAX_PROCESSED_POSTS = 500; // Limit processed cache
+
 const hidePost = (postElement, reason = 'filtered') => {
   if (postElement.hasAttribute('data-zen-replaced')) return;
 
@@ -118,6 +127,11 @@ const hidePost = (postElement, reason = 'filtered') => {
   const tweetId = postElement.querySelector('a[href*="/status/"]')?.href?.match(/\/status\/(\d+)/)?.[1];
   const postId = tweetId || `${Date.now()}-${Math.random()}`;
 
+  // Limit cache size to prevent memory leak
+  if (hiddenPostsContent.size >= MAX_HIDDEN_POSTS) {
+    const firstKey = hiddenPostsContent.keys().next().value;
+    hiddenPostsContent.delete(firstKey);
+  }
   hiddenPostsContent.set(postId, postElement.innerHTML);
   postElement.setAttribute('data-zen-post-id', postId);
   postElement.setAttribute('data-zen-filtered', 'true');
@@ -125,19 +139,34 @@ const hidePost = (postElement, reason = 'filtered') => {
 
   const placeholder = document.createElement('div');
   placeholder.className = 'zen-hidden-post';
-  placeholder.innerHTML = `
-    <div class="zen-hidden-post-icon">🧘</div>
-    <div class="zen-hidden-post-message">Post hidden by Zen</div>
-    <div class="zen-hidden-post-reason">${username ? `@${username}` : 'Post'} · ${reason}</div>
-    <button class="zen-show-button">
-      <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path></svg>
-      Show
-    </button>
-  `;
-  placeholder.querySelector('.zen-show-button').addEventListener('click', (e) => {
+
+  const icon = document.createElement('div');
+  icon.className = 'zen-hidden-post-icon';
+  icon.textContent = '🧘';
+
+  const message = document.createElement('div');
+  message.className = 'zen-hidden-post-message';
+  message.textContent = 'Post hidden by Zen';
+
+  const reasonEl = document.createElement('div');
+  reasonEl.className = 'zen-hidden-post-reason';
+  reasonEl.textContent = `${username ? `@${username}` : 'Post'} · ${reason}`;
+
+  const showBtn = document.createElement('button');
+  showBtn.className = 'zen-show-button';
+  showBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path></svg>';
+  const showText = document.createElement('span');
+  showText.textContent = ' Show';
+  showBtn.appendChild(showText);
+  showBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     showPost(postElement);
   });
+
+  placeholder.appendChild(icon);
+  placeholder.appendChild(message);
+  placeholder.appendChild(reasonEl);
+  placeholder.appendChild(showBtn);
 
   postElement.innerHTML = '';
   postElement.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center';

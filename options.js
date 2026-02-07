@@ -267,11 +267,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       const text = await file.text();
       const importData = JSON.parse(text);
 
-      if (!importData.settings) {
+      if (!importData.settings || typeof importData.settings !== 'object') {
         throw new Error('Invalid settings file format');
       }
 
       const settings = importData.settings;
+
+      // Validate data types
+      const validateString = (v) => typeof v === 'string';
+      const validateBool = (v) => typeof v === 'boolean';
+      const validateNumber = (v) => typeof v === 'number' && !isNaN(v);
+      const validateArray = (v) => Array.isArray(v) && v.every(i => typeof i === 'string');
 
       if (typeof settings.enabled !== 'undefined') {
         document.getElementById('enableToggle').checked = settings.enabled !== false;
@@ -348,10 +354,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('cryptoProvider').value = settings.cryptoProvider;
       }
 
-      if (settings.customProviderConfig) {
-        document.getElementById('customBaseUrl').value = settings.customProviderConfig.baseUrl || '';
-        document.getElementById('customVisionModel').value = settings.customProviderConfig.visionModel || '';
-        document.getElementById('customTextModel').value = settings.customProviderConfig.textModel || '';
+      if (settings.customProviderConfig && typeof settings.customProviderConfig === 'object') {
+        // Validate URL before importing
+        const baseUrl = settings.customProviderConfig.baseUrl || '';
+        if (baseUrl && !baseUrl.startsWith('https://')) {
+          throw new Error('Custom provider URL must use HTTPS');
+        }
+        document.getElementById('customBaseUrl').value = baseUrl;
+        document.getElementById('customVisionModel').value = String(settings.customProviderConfig.visionModel || '');
+        document.getElementById('customTextModel').value = String(settings.customProviderConfig.textModel || '');
       }
 
       updateProviderVisibility();
@@ -460,6 +471,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (requiredProviders.has('custom')) {
       if (!customProviderConfig.baseUrl) {
         showStatus('Base URL required for custom provider', 'error');
+        return;
+      }
+      if (!customProviderConfig.baseUrl.startsWith('https://')) {
+        showStatus('Custom provider URL must use HTTPS', 'error');
+        return;
+      }
+      // Block localhost/internal URLs
+      try {
+        const url = new URL(customProviderConfig.baseUrl);
+        const host = url.hostname.toLowerCase();
+        if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.') || host.startsWith('10.')) {
+          showStatus('Custom provider URL cannot be localhost or internal IP', 'error');
+          return;
+        }
+      } catch {
+        showStatus('Invalid custom provider URL', 'error');
         return;
       }
       if (!customProviderConfig.textModel) {

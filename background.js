@@ -100,6 +100,10 @@ const callClaudeAPI = async (apiKey, model, messages, maxTokens = 10) => {
 
 const callProviderAPI = async (providerId, provider, apiKey, messages, maxTokens = 10, useVisionModel = false) => {
   const model = useVisionModel ? provider.models.vision : provider.models.text;
+  // Validate custom provider URL before making request
+  if (providerId === 'custom' && !isValidProviderUrl(provider.baseUrl)) {
+    throw new Error('Invalid custom provider URL');
+  }
   return providerId === 'claude'
     ? await callClaudeAPI(apiKey, model, messages, maxTokens)
     : await callOpenAIStyleAPI(provider.baseUrl, apiKey, model, messages, maxTokens);
@@ -189,7 +193,30 @@ const checkCryptoContent = async (text) => {
   }
 };
 
+// Validate custom provider URL
+const isValidProviderUrl = (url) => {
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    // Must be HTTPS
+    if (parsed.protocol !== 'https:') return false;
+    // Block localhost and internal IPs
+    const host = parsed.hostname.toLowerCase();
+    if (host === 'localhost' || host === '127.0.0.1' || host === '::1') return false;
+    if (host.startsWith('192.168.') || host.startsWith('10.') || host.startsWith('172.')) return false;
+    if (host.endsWith('.local') || host.endsWith('.internal')) return false;
+    return true;
+  } catch { return false; }
+};
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  // Validate sender - only accept from our extension pages or Twitter/X
+  const validSender = sender.id === chrome.runtime.id &&
+    (sender.url?.startsWith('chrome-extension://') ||
+     sender.tab?.url?.includes('twitter.com') ||
+     sender.tab?.url?.includes('x.com'));
+  if (!validSender) return false;
+
   const safeSend = (data) => { try { sendResponse(data); } catch {} };
 
   if (request.action === 'checkImage') {
@@ -219,6 +246,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
         if (!apiKey) throw new Error('API key required');
         if (providerId === 'custom' && !provider.baseUrl) throw new Error('Base URL required');
+        if (providerId === 'custom' && !isValidProviderUrl(provider.baseUrl)) throw new Error('Invalid URL: must be HTTPS and not localhost/internal');
         await callProviderAPI(providerId, provider, apiKey, [{ role: 'user', content: 'test' }], 10, false);
         safeSend({ success: true });
       } catch (error) {
