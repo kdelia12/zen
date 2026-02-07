@@ -82,10 +82,47 @@ const getPostImages = (postElement) => {
 };
 
 const isReply = (postElement) => {
+  // Method 1: Check for reply context element (most reliable)
+  const replyContext = postElement.querySelector('[data-testid="socialContext"]');
+  if (replyContext) {
+    const text = replyContext.textContent || '';
+    if (text.includes('Replying to') || text.includes('Membalas') || text.includes('replied')) return true;
+  }
+
+  // Method 2: Check for "Replying to" link which Twitter uses
+  const replyLinks = postElement.querySelectorAll('a[href^="/"]');
+  for (const link of replyLinks) {
+    const parent = link.parentElement;
+    if (parent?.textContent?.includes('Replying to') || parent?.textContent?.includes('Membalas')) return true;
+  }
+
+  // Method 3: Check header area
   const headerText = Array.from(postElement.querySelectorAll('[data-testid="User-Name"]')).map(el => el.textContent).join(' ');
   if (headerText.includes('Replying to') || headerText.includes('Membalas')) return true;
+
+  // Method 4: Check for reply indicator in tweet structure
+  // Replies often have a vertical line connecting to parent
+  const hasThreadLine = postElement.querySelector('[data-testid="Tweet-User-Avatar"]')?.closest('div')?.previousElementSibling?.querySelector('div[style*="border"]');
+  if (hasThreadLine) return true;
+
+  // Method 5: Check if there's a "Show this thread" or thread context
+  const threadIndicator = postElement.querySelector('[data-testid="tweet"] a[href*="/status/"]');
+  if (threadIndicator) {
+    const siblingText = threadIndicator.parentElement?.parentElement?.textContent || '';
+    if (siblingText.includes('Show this thread') || siblingText.includes('Lihat thread')) return true;
+  }
+
+  // Method 6: Check aria-label for reply indication
+  const article = postElement.closest('article') || postElement;
+  const ariaLabel = article.getAttribute('aria-label') || '';
+  if (ariaLabel.toLowerCase().includes('reply') || ariaLabel.toLowerCase().includes('replied')) return true;
+
+  // Method 7: Full text fallback (less reliable but catches edge cases)
   const fullText = postElement.textContent || '';
-  return fullText.startsWith('Replying to') || fullText.startsWith('Membalas');
+  const firstLine = fullText.split('\n')[0] || '';
+  if (firstLine.includes('Replying to') || firstLine.includes('Membalas')) return true;
+
+  return false;
 };
 
 const getPostUsername = (postElement) => {
