@@ -1,0 +1,59 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zen</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="popup-container">
+    <div class="header">
+      <div class="logo-container">
+        <span class="logo-icon">🧘</span>
+        <h1>Zen</h1>
+      </div>
+      <span class="status-badge" id="statusBadge">Inactive</span>
+    </div>
+    
+    <div class="main-content">
+      <!-- Power Switch -->
+      <div class="power-switch-container" id="powerContainer">
+        <label class="switch">
+          <input type="checkbox" id="enableToggle">
+          <span class="slider"></span>
+        </label>
+        <span class="switch-label" id="statusText">Extension Disabled</span>
+      </div>
+
+      <!-- Mode Selection -->
+      <div class="mode-selector">
+        <label class="mode-option">
+          <input type="radio" name="mode" value="default" id="modeDefault">
+          <div class="mode-card">
+            <div class="mode-icon">👁️</div>
+            <div class="mode-title">Focus</div>
+            <div class="mode-desc">Hide distractions</div>
+          </div>
+        </label>
+        
+        <label class="mode-option">
+          <input type="radio" name="mode" value="agent" id="modeAgent">
+          <div class="mode-card">
+            <div class="mode-icon">🤖</div>
+            <div class="mode-title">Agent</div>
+            <div class="mode-desc">Auto-clean feed</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="footer">
+      <a href="#" id="optionsLink" class="settings-link">
+        <span>⚙️</span> Advanced Settings
+      </a>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
+

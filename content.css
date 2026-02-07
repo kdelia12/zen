@@ -1,0 +1,157 @@
+/* Zen Hidden Post Overlay - Premium Dark Glass Theme */
+.zen-hidden-post {
+    /* Force dark theme for the overlay regardless of Twitter theme */
+    background: rgba(15, 20, 25, 0.85) !important;
+    /* Very dark blue/black */
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 16px !important;
+    padding: 32px 24px !important;
+    min-height: 120px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 12px 0 !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Subtle gradient overlay */
+.zen-hidden-post::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+}
+
+.zen-hidden-post:hover {
+    background: rgba(22, 27, 34, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    transform: translateY(-1px);
+}
+
+.zen-hidden-post-icon {
+    font-size: 24px !important;
+    margin-bottom: 12px !important;
+    filter: drop-shadow(0 0 12px rgba(29, 155, 240, 0.4));
+    animation: zenFloat 3s ease-in-out infinite;
+}
+
+@keyframes zenFloat {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.zen-hidden-post-message {
+    color: #f7f9f9 !important;
+    /* Almost white */
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    line-height: 20px !important;
+    margin-bottom: 6px !important;
+    text-align: center !important;
+    letter-spacing: -0.2px !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.zen-hidden-post-reason {
+    color: #8b98a5 !important;
+    /* Gray */
+    font-size: 13px !important;
+    line-height: 18px !important;
+    margin-bottom: 20px !important;
+    text-align: center !important;
+    max-width: 90% !important;
+    opacity: 0.9 !important;
+}
+
+.zen-show-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 8px 20px !important;
+    background: rgba(29, 155, 240, 0.15) !important;
+    /* Twitter Blue tint */
+    color: #1d9bf0 !important;
+    /* Twitter Blue */
+    border: 1px solid rgba(29, 155, 240, 0.3) !important;
+    border-radius: 9999px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+    font-family: inherit !important;
+    backdrop-filter: blur(4px);
+}
+
+.zen-show-button:hover {
+    background: rgba(29, 155, 240, 0.25) !important;
+    border-color: rgba(29, 155, 240, 0.5) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(29, 155, 240, 0.2);
+}
+
+.zen-show-button:active {
+    transform: translateY(0);
+    background: rgba(29, 155, 240, 0.1) !important;
+}
+
+.zen-show-button svg {
+    width: 14px !important;
+    height: 14px !important;
+    fill: currentColor !important;
+}
+
+/* Agent Mode Notification */
+.zen-agent-notification {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(29, 155, 240, 0.9);
+    /* Twitter Blue with transparency */
+    color: white;
+    padding: 12px 24px;
+    border-radius: 9999px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+    z-index: 999999;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.zen-agent-notification.zen-show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.zen-agent-notification svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}

@@ -1,0 +1,315 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zen Settings</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="options-container">
+    <div class="options-header">
+      <h1>Zen Settings</h1>
+      <p>Configure your filtering preferences</p>
+    </div>
+
+    <div class="settings-grid">
+      <!-- Extension Control -->
+      <div class="setting-card">
+        <div class="card-header">
+          <span class="card-icon">⚡</span>
+          <span class="card-title">Extension Control</span>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Enable Extension</div>
+            <div class="toggle-desc">Turn Zen on or off globally</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="enableToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Mode Selection -->
+      <div class="setting-card">
+        <div class="card-header">
+          <span class="card-icon">🎯</span>
+          <span class="card-title">Mode Selection</span>
+        </div>
+        <div class="mode-selector"
+          style="grid-template-columns: 1fr 1fr; gap: 16px; border: none; padding: 0; background: transparent;">
+          <label class="mode-option">
+            <input type="radio" name="mode" value="default" id="modeDefault">
+            <div class="mode-card" style="background: var(--bg-dark); border: 1px solid var(--border-color);">
+              <div class="mode-icon">👁️</div>
+              <div class="mode-title">Default Mode</div>
+              <div class="mode-desc">Hide filtered posts automatically</div>
+            </div>
+          </label>
+          <label class="mode-option">
+            <input type="radio" name="mode" value="agent" id="modeAgent">
+            <div class="mode-card" style="background: var(--bg-dark); border: 1px solid var(--border-color);">
+              <div class="mode-icon">🤖</div>
+              <div class="mode-title">Agent Mode</div>
+              <div class="mode-desc">Auto-scroll and click "not interested"</div>
+            </div>
+          </label>
+        </div>
+
+        <div id="agentSettings" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border-color);">
+          <h3 style="font-size: 14px; margin-bottom: 16px; color: var(--text-secondary);">Agent Configuration</h3>
+          <div class="input-group">
+            <label class="input-label" for="scrollDelay">Scroll Delay (ms)</label>
+            <input type="number" id="scrollDelay" min="500" max="10000" step="100" class="text-input">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="clickDelay">Click Delay (ms)</label>
+            <input type="number" id="clickDelay" min="1000" max="10000" step="100" class="text-input">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="pauseDuration">Pause Duration (ms)</label>
+            <input type="number" id="pauseDuration" min="2000" max="30000" step="500" class="text-input">
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Providers -->
+      <div class="setting-card">
+        <div class="card-header">
+          <span class="card-icon">🤖</span>
+          <span class="card-title">AI Providers</span>
+        </div>
+
+        <!-- Provider Selection -->
+        <div class="input-group">
+          <label class="input-label" for="imageProvider">Image Filter Provider</label>
+          <select id="imageProvider" class="text-input">
+            <option value="openai">OpenAI (GPT-4o-mini)</option>
+            <option value="claude">Claude (Sonnet 4)</option>
+            <option value="kimi">Kimi (Moonshot)</option>
+            <option value="custom">Custom (OpenAI-compatible)</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label" for="cryptoProvider">Crypto Detection Provider</label>
+          <select id="cryptoProvider" class="text-input">
+            <option value="openai">OpenAI (GPT-4o-mini)</option>
+            <option value="claude">Claude (Haiku 4)</option>
+            <option value="kimi">Kimi (Moonshot)</option>
+            <option value="custom">Custom (OpenAI-compatible)</option>
+          </select>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid var(--border-color); margin: 24px 0;">
+
+        <!-- OpenAI API Key -->
+        <div id="openaiConfig" class="provider-config">
+          <h4 style="font-size: 14px; margin-bottom: 12px; color: var(--text-primary);">OpenAI</h4>
+          <div class="input-group">
+            <label class="input-label" for="openaiApiKey">API Key</label>
+            <input type="password" id="openaiApiKey" placeholder="sk-..." class="text-input">
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="testOpenai" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">Test</button>
+            <span id="openaiStatus" class="helper-text"></span>
+          </div>
+        </div>
+
+        <!-- Claude API Key -->
+        <div id="claudeConfig" class="provider-config" style="margin-top: 16px;">
+          <h4 style="font-size: 14px; margin-bottom: 12px; color: var(--text-primary);">Claude (Anthropic)</h4>
+          <div class="input-group">
+            <label class="input-label" for="claudeApiKey">API Key</label>
+            <input type="password" id="claudeApiKey" placeholder="sk-ant-..." class="text-input">
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="testClaude" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">Test</button>
+            <span id="claudeStatus" class="helper-text"></span>
+          </div>
+        </div>
+
+        <!-- Kimi API Key -->
+        <div id="kimiConfig" class="provider-config" style="margin-top: 16px;">
+          <h4 style="font-size: 14px; margin-bottom: 12px; color: var(--text-primary);">Kimi (Moonshot)</h4>
+          <div class="input-group">
+            <label class="input-label" for="kimiApiKey">API Key</label>
+            <input type="password" id="kimiApiKey" placeholder="sk-..." class="text-input">
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="testKimi" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">Test</button>
+            <span id="kimiStatus" class="helper-text"></span>
+          </div>
+        </div>
+
+        <!-- Custom Provider -->
+        <div id="customConfig" class="provider-config" style="margin-top: 16px;">
+          <h4 style="font-size: 14px; margin-bottom: 12px; color: var(--text-primary);">Custom (OpenAI-compatible)</h4>
+          <div class="input-group">
+            <label class="input-label" for="customBaseUrl">Base URL</label>
+            <input type="text" id="customBaseUrl" placeholder="https://api.example.com/v1" class="text-input">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="customVisionModel">Vision Model</label>
+            <input type="text" id="customVisionModel" placeholder="gpt-4-vision-preview" class="text-input">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="customTextModel">Text Model</label>
+            <input type="text" id="customTextModel" placeholder="gpt-3.5-turbo" class="text-input">
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="customApiKey">API Key</label>
+            <input type="password" id="customApiKey" placeholder="sk-..." class="text-input">
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="testCustom" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">Test</button>
+            <span id="customStatus" class="helper-text"></span>
+          </div>
+        </div>
+
+        <p class="helper-text" style="margin-top: 16px;">API keys are stored locally and never sent to third parties.</p>
+      </div>
+
+      <!-- Filter Features -->
+      <div class="setting-card">
+        <div class="card-header">
+          <span class="card-icon">🛡️</span>
+          <span class="card-title">Filter Features</span>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Image Filtering</div>
+            <div class="toggle-desc">Detect thirst traps & selfies</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="enableImageFilter">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row"
+          style="padding-left: 16px; border-left: 2px solid var(--border-color); margin: 8px 0 16px 8px;">
+          <div class="toggle-info">
+            <div class="toggle-title" style="font-size: 14px;">Use Free Moderation API</div>
+            <div class="toggle-desc" style="font-size: 12px;">Strict thresholds, no credits required</div>
+          </div>
+          <label class="switch" style="transform: scale(0.9);">
+            <input type="checkbox" id="useFreeImageModeration">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="input-group"
+          style="padding-left: 16px; border-left: 2px solid var(--border-color); margin: 0 0 24px 8px;">
+          <label class="input-label" for="sexualThreshold">Sensitivity (0.0 - 1.0)</label>
+          <input type="number" id="sexualThreshold" min="0" max="1" step="0.1" class="text-input" style="width: 120px;">
+          <p class="helper-text">Lower = more strict (default: 0.3)</p>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Keyword Filtering</div>
+            <div class="toggle-desc">Filter by specific words</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="enableKeywordFilter">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Credibility Filter</div>
+            <div class="toggle-desc">Hide low credibility users (Ethos Network)</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="enableCredibilityFilter">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="input-group" style="margin-top: 8px;">
+          <label class="input-label" for="credibilityThreshold">Min Score</label>
+          <input type="number" id="credibilityThreshold" min="0" step="100" class="text-input" style="width: 120px;">
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-title">Lock-in Mode</div>
+            <div class="toggle-desc">Show ONLY crypto content (requires API)</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="lockInMode">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Lists -->
+      <div class="setting-card">
+        <div class="card-header">
+          <span class="card-icon">📝</span>
+          <span class="card-title">Allowlists & Blacklists</span>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Account Allowlist (Always Show)</label>
+          <textarea id="accountAllowlist" class="textarea-input" placeholder="vitalikbuterin&#10;elonmusk"></textarea>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Account Blacklist (Always Hide)</label>
+          <textarea id="accountBlacklist" class="textarea-input" placeholder="spam_account&#10;bot_account"></textarea>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Keyword Allowlist (Show Only)</label>
+          <textarea id="allowlist" class="textarea-input" placeholder="crypto&#10;bitcoin"></textarea>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Keyword Blacklist (Always Hide)</label>
+          <textarea id="blacklist" class="textarea-input" placeholder="politics&#10;sports"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button id="resetAccountAllowlist" class="btn btn-secondary" style="font-size: 12px; padding: 8px 16px;">Clear
+            Acct Allow</button>
+          <button id="resetAccountBlacklist" class="btn btn-secondary" style="font-size: 12px; padding: 8px 16px;">Clear
+            Acct Block</button>
+          <button id="resetAllowlist" class="btn btn-secondary" style="font-size: 12px; padding: 8px 16px;">Reset
+            Keywords</button>
+          <button id="resetBlacklist" class="btn btn-secondary" style="font-size: 12px; padding: 8px 16px;">Clear
+            Keywords</button>
+        </div>
+      </div>
+
+      <!-- Data Management -->
+      <div class="setting-card">
+        <div class="card-header">
+          <span class="card-icon">💾</span>
+          <span class="card-title">Data Management</span>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button id="exportBtn" class="btn btn-secondary">Export Settings</button>
+          <button id="importBtn" class="btn btn-secondary">Import Settings</button>
+        </div>
+        <input type="file" id="importFile" accept=".json" style="display: none;">
+        <p id="importStatus" class="helper-text" style="display: none;"></p>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button id="cancelBtn" class="btn btn-secondary">Cancel</button>
+      <button id="saveBtn" class="btn btn-primary">Save Changes</button>
+    </div>
+    <div id="saveStatus" style="text-align: center; margin-top: 16px; font-size: 14px; font-weight: 600;"></div>
+  </div>
+  <script src="options.js"></script>
+</body>
+
+</html>
